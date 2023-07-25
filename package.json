@@ -20,5 +20,11 @@
     "javascript",
     "promise",
     "async"
-  ]
+  ],
+  "devDependencies": {
+    "awai": "^0.0.1-alpha-3"
+  },
+  "peerDependencies": {
+    "awai": "*"
+  }
 }
