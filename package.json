@@ -1,10 +1,19 @@
 {
-  "name": "awai",
+  "name": "awai-react",
   "version": "0.0.0",
   "author": "Yuriy Yakym",
   "description": "React hooks for Awai integration",
   "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "typings": "dist/index.d.ts",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && rollup -c rollup.config.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yuriyyakym/awai-react.git"
@@ -22,8 +31,13 @@
     "async"
   ],
   "devDependencies": {
+    "@types/react": "^18.2.16",
     "awai": "^0.0.1-alpha-3",
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "rollup": "^3.26.3",
+    "rollup-plugin-dts": "^5.3.0",
+    "rollup-plugin-esbuild": "^5.0.0",
+    "typescript": "^5.1.6"
   },
   "peerDependencies": {
     "awai": "*",
