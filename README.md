@@ -11,6 +11,6 @@
   <br />
   
   <p>
-    | <a href="https://www.npmjs.com/package/awai">Awai</a> | <a href="https://awai.vercel.app/">Documentation</a> |
+    | <a href="https://github.com/yuriyyakym/awai">Awai</a> | <a href="https://awai.vercel.app/">Documentation</a> |
   </p>
 </div>
