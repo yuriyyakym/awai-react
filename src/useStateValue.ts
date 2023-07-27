@@ -1,7 +1,14 @@
-import { ReadableAsyncState, ReadableState, isReadableAsyncState } from 'awai';
+import {
+  type InferReadableType,
+  type ReadableAsyncState,
+  type ReadableState,
+  isReadableAsyncState,
+} from 'awai';
 import { useEffect, useState } from 'react';
 
-const useStateValue = <T>(readable: ReadableState<T> | ReadableAsyncState<T>): T => {
+const useStateValue = <T extends ReadableState<any> | ReadableAsyncState<any>>(
+  readable: T,
+): InferReadableType<T> => {
   const [state, setState] = useState<T | undefined>(readable.get);
 
   if (isReadableAsyncState(readable) && state === undefined) {
@@ -29,7 +36,7 @@ const useStateValue = <T>(readable: ReadableState<T> | ReadableAsyncState<T>): T
     };
   }, [readable]);
 
-  return state as T;
+  return state as InferReadableType<T>;
 };
 
 export default useStateValue;
