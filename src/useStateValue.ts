@@ -11,7 +11,7 @@ const useStateValue = <T extends ReadableState<any> | ReadableAsyncState<any>>(
 ): InferReadableType<T> => {
   const [state, setState] = useState<T | undefined>(readable.get);
 
-  if (isReadableAsyncState(readable) && state === undefined) {
+  if (isReadableAsyncState(readable) && readable.get() === undefined) {
     throw new Promise((resolve) => readable.events.changed.then(resolve));
   }
 
@@ -26,9 +26,9 @@ const useStateValue = <T extends ReadableState<any> | ReadableAsyncState<any>>(
          * @todo Cleanup on unmount
          * @url https://github.com/yuriyyakym/awai/issues/1
          */
-        await readable.events.changed;
+        const newValue = await readable.events.changed;
         if (mounted) {
-          setState(readable.get());
+          setState(newValue);
         }
       }
     })();
