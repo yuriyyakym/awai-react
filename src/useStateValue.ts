@@ -18,6 +18,8 @@ const useStateValue = <T extends ReadableState<any> | ReadableAsyncState<any>>(
   useEffect(() => {
     let mounted = true;
 
+    setState(readable.get());
+
     (async () => {
       while (mounted) {
         /**
