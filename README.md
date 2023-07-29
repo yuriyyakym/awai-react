@@ -4,6 +4,7 @@
   <p>React hooks for <a href="https://awai.vercel.app">Awai</a> integration</p>
 
   <div>
+    <img src="https://github.com/yuriyyakym/awai-react/actions/workflows/tests.yml/badge.svg" />
     <img src="https://img.shields.io/badge/stability-experimental-blue.svg" />
     <img src="https://img.shields.io/badge/License-MIT-blue.svg" />
   </div>
