@@ -1,9 +1,7 @@
 import { type InferReadableType, type ReadableAsyncState, AsyncValue } from 'awai';
 import { useEffect, useState } from 'react';
 
-const useAsyncStateValue = <Q, T extends ReadableAsyncState<Q>>(
-  readable: T,
-): InferReadableType<T> => {
+const useAsyncStateValue = <Q, T extends ReadableAsyncState<Q>>(readable: T): AsyncValue<Q> => {
   const [state, setState] = useState<AsyncValue<Q>>(readable.getAsync);
 
   useEffect(() => {
@@ -29,7 +27,7 @@ const useAsyncStateValue = <Q, T extends ReadableAsyncState<Q>>(
     };
   }, [readable]);
 
-  return state as InferReadableType<T>;
+  return state;
 };
 
 export default useAsyncStateValue;
