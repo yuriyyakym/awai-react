@@ -1,8 +1,10 @@
-import { type InferReadableType, type ReadableAsyncState, AsyncValue } from 'awai';
+import type { InferReadableType, ReadableAsyncState, AsyncValue } from 'awai';
 import { useEffect, useState } from 'react';
 
-const useAsyncStateValue = <Q, T extends ReadableAsyncState<Q>>(readable: T): AsyncValue<Q> => {
-  const [state, setState] = useState<AsyncValue<Q>>(readable.getAsync);
+const useAsyncStateValue = <T extends ReadableAsyncState<any>, V = InferReadableType<T>>(
+  readable: T,
+): AsyncValue<V> => {
+  const [state, setState] = useState<AsyncValue<V>>(readable.getAsync);
 
   useEffect(() => {
     let mounted = true;
