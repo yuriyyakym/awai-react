@@ -29,6 +29,7 @@ const useAsyncStateValue = <T extends ReadableAsyncState<any>, V = InferReadable
           if (mounted) {
             setState(readable.getAsync());
           }
+        } catch {
         } finally {
           abortController.abort();
         }
