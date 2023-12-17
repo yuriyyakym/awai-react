@@ -8,24 +8,36 @@ const useAsyncStateValue = <T extends ReadableAsyncState<any>, V = InferReadable
 
   useEffect(() => {
     let mounted = true;
+    let abortController: AbortController;
 
     setState(readable.getAsync());
 
     (async () => {
       while (mounted) {
+        abortController = new AbortController();
         /**
          * @todo Cleanup on unmount
          * @url https://github.com/yuriyyakym/awai/issues/1
          */
-        await readable.events.changed;
-        if (mounted) {
-          setState(readable.getAsync());
+        try {
+          await Promise.any([
+            readable.events.fulfilled.abortable(abortController),
+            readable.events.rejected.abortable(abortController),
+            readable.events.requested.abortable(abortController),
+          ]);
+
+          if (mounted) {
+            setState(readable.getAsync());
+          }
+        } finally {
+          abortController.abort();
         }
       }
     })();
 
     return () => {
       mounted = false;
+      abortController?.abort();
     };
   }, [readable]);
 
