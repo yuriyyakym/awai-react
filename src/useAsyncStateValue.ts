@@ -26,7 +26,13 @@ const useAsyncStateValue = <T extends ReadableAsyncState<any>, V = InferReadable
             readable.events.requested.abortable(abortController),
           ]);
 
-          if (mounted) {
+          const newAsync = readable.getAsync();
+          const isChanged =
+            newAsync.error !== state.error ||
+            newAsync.isLoading !== state.isLoading ||
+            newAsync.value !== state.value;
+
+          if (isChanged && mounted) {
             setState(readable.getAsync());
           }
         } catch {
