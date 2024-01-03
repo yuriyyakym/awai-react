@@ -4,7 +4,7 @@ import {
   type ReadableState,
   isReadableAsyncState,
 } from 'awai';
-import { useEffect, useState } from 'react';
+import { startTransition, useEffect, useState } from 'react';
 
 const useStateValue = <T extends ReadableState<any> | ReadableAsyncState<any>>(
   readable: T,
@@ -12,7 +12,9 @@ const useStateValue = <T extends ReadableState<any> | ReadableAsyncState<any>>(
   const [state, setState] = useState<T | undefined>(readable.get);
 
   if (isReadableAsyncState(readable) && readable.get() === undefined) {
-    throw new Promise((resolve) => readable.events.changed.then(resolve));
+    startTransition(() => {
+      throw new Promise((resolve) => readable.events.changed.then(resolve));
+    });
   }
 
   useEffect(() => {
