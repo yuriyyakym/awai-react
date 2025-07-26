@@ -1,9 +1,10 @@
 import dts from 'rollup-plugin-dts';
 import esbuild from 'rollup-plugin-esbuild';
+import { readFileSync } from 'fs';
 
-import packageJson from './package.json' assert { type: 'json' };
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'));
 
-const name = packageJson.main.replace(/\.js$/, '');
+const name = packageJson.main.replace(/\.cjs$/, '');
 
 const bundle = (config) => ({
   ...config,
@@ -16,7 +17,7 @@ export default [
     external: ['react'],
     output: [
       {
-        file: `${name}.js`,
+        file: `${name}.cjs`,
         format: 'cjs',
         sourcemap: true,
       },
