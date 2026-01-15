@@ -19,7 +19,7 @@ const suspend = (promise: Promise<unknown>) => {
   throw promise;
 };
 
-const useStateValue = <T>(readable: ReadableState<T> | ReadableAsyncState<T>): T => {
+const useAwaiStateValue = <T>(readable: ReadableState<T> | ReadableAsyncState<T>): T => {
   const isAsync = isReadableAsyncState(readable);
   const getSnapshot = useMemo(() => createGetSnapshot(readable), [readable]);
   const subscribe = useMemo(() => createSubscribe(readable), [readable]);
@@ -48,4 +48,4 @@ const useStateValue = <T>(readable: ReadableState<T> | ReadableAsyncState<T>): T
   return asyncSnapshot.value!;
 };
 
-export default useStateValue;
+export default useAwaiStateValue;

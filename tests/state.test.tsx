@@ -2,7 +2,7 @@ import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { asyncState, delay, state } from 'awai';
 
-import { useAsyncStateValue, useState, useStateValue } from '../src';
+import { useAwaiAsyncValue, useAwaiState, useAwaiStateValue } from '../src';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -25,10 +25,10 @@ const render = async (ui: React.ReactElement) => {
   };
 };
 
-describe('useStateValue', () => {
+describe('useAwaiStateValue', () => {
   it('reads an initial value of a state', async () => {
     const nameState = state('Awai');
-    const Component = () => useStateValue(nameState);
+    const Component = () => useAwaiStateValue(nameState);
     const result = await render(<Component />);
     expect(result.container.textContent).toEqual('Awai');
     await result.unmount();
@@ -36,7 +36,7 @@ describe('useStateValue', () => {
 
   it('reads an updated value of a state', async () => {
     const nameState = state('test');
-    const Component = () => useStateValue(nameState);
+    const Component = () => useAwaiStateValue(nameState);
     const result = await render(<Component />);
     await act(async () => {
       await nameState.set('Awai');
@@ -47,7 +47,7 @@ describe('useStateValue', () => {
 
   it('reads an initial value of an async state', async () => {
     const nameState = asyncState('Awai');
-    const Component = () => useStateValue(nameState);
+    const Component = () => useAwaiStateValue(nameState);
     const result = await render(<Component />);
     expect(result.container.textContent).toEqual('Awai');
     await result.unmount();
@@ -55,7 +55,7 @@ describe('useStateValue', () => {
 
   it('suspends when reading a pending async state', async () => {
     const nameState = asyncState(delay(10).then(() => 'Awai'));
-    const Component = () => useStateValue(nameState);
+    const Component = () => useAwaiStateValue(nameState);
     const result = await render(
       <React.Suspense fallback="loading">
         <Component />
@@ -71,7 +71,7 @@ describe('useStateValue', () => {
 
   it('reads an updated value of an async state', async () => {
     const nameState = asyncState(delay(20).then(() => 'Awai'));
-    const Component = () => useStateValue(nameState);
+    const Component = () => useAwaiStateValue(nameState);
     const result = await render(
       <React.Suspense fallback="loading">
         <Component />
@@ -103,7 +103,7 @@ describe('useStateValue', () => {
       }
     }
 
-    const Component = () => useStateValue(nameState);
+    const Component = () => useAwaiStateValue(nameState);
     const result = await render(
       <ErrorBoundary fallback="error">
         <React.Suspense fallback="loading">
@@ -124,11 +124,11 @@ describe('useStateValue', () => {
   });
 });
 
-describe('useAsyncStateValue', () => {
+describe('useAwaiAsyncValue', () => {
   it('reports loading and then value for a pending async state', async () => {
     const nameState = asyncState(delay(10).then(() => 'Awai'));
     const Component = () => {
-      const snapshot = useAsyncStateValue(nameState);
+      const snapshot = useAwaiAsyncValue(nameState);
       const status = snapshot.error ? 'error' : snapshot.isLoading ? 'loading' : 'ready';
       const value = snapshot.value ?? '-';
       return <div>{`${status}:${value}`}</div>;
@@ -148,7 +148,7 @@ describe('useAsyncStateValue', () => {
   it('reports error for a rejected async state', async () => {
     const nameState = asyncState(delay(10).then(() => Promise.reject(new Error('boom'))));
     const Component = () => {
-      const snapshot = useAsyncStateValue(nameState);
+      const snapshot = useAwaiAsyncValue(nameState);
       const status = snapshot.error ? 'error' : snapshot.isLoading ? 'loading' : 'ready';
       return <div>{status}</div>;
     };
@@ -165,13 +165,13 @@ describe('useAsyncStateValue', () => {
   });
 });
 
-describe('useState', () => {
+describe('useAwaiState', () => {
   it('returns value and setter for a state', async () => {
     const nameState = state('test');
     let setName: ((value: string) => Promise<string>) | undefined;
 
     const Component = () => {
-      const [value, setValue] = useState(nameState);
+      const [value, setValue] = useAwaiState(nameState);
       setName = setValue;
       return <div>{value}</div>;
     };
