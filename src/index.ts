@@ -1,4 +1,4 @@
-export { default as useAsyncStateValue } from './useAsyncStateValue';
-export { default as useSetState } from './useSetState';
-export { default as useState } from './useState';
-export { default as useStateValue } from './useStateValue';
+export { default as useAwaiAsyncValue } from './useAwaiAsyncValue';
+export { default as useAwaiSetState } from './useAwaiSetState';
+export { default as useAwaiState } from './useAwaiState';
+export { default as useAwaiStateValue } from './useAwaiStateValue';
