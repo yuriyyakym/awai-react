@@ -85,7 +85,7 @@ describe('useStateValue', () => {
   });
 
   it('throws to an error boundary when an async state rejects', async () => {
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const nameState = asyncState(delay(10).then(() => Promise.reject(new Error('boom'))));
 
     class ErrorBoundary extends React.Component<
