@@ -17,12 +17,12 @@ function createGetSnapshot<const R extends ReadableInput>(readable: R): () => Sn
 
   return () => {
     const snapshot = readable.getAsync();
-    const isEaual =
-      snapshot.error === previousSnapshot?.error ||
-      snapshot.isLoading === previousSnapshot?.isLoading ||
+    const isEqual =
+      snapshot.error === previousSnapshot?.error &&
+      snapshot.isLoading === previousSnapshot?.isLoading &&
       snapshot.value === previousSnapshot?.value;
 
-    if (isEaual) {
+    if (isEqual) {
       return previousSnapshot as SnapshotValue<R>;
     }
 
