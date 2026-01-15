@@ -2,6 +2,7 @@ import {
   type AsyncValue,
   type ReadableAsyncState,
   type ReadableState,
+  type InferReadableType,
   isReadableAsyncState,
 } from 'awai';
 import * as React from 'react';
@@ -19,7 +20,11 @@ const suspend = (promise: Promise<unknown>) => {
   throw promise;
 };
 
-const useAwaiStateValue = <T>(readable: ReadableState<T> | ReadableAsyncState<T>): T => {
+const useAwaiStateValue = <R extends ReadableState<any> | ReadableAsyncState<any>>(
+  readable: R,
+): InferReadableType<R> => {
+  type T = InferReadableType<R>;
+
   const isAsync = isReadableAsyncState(readable);
   const getSnapshot = useMemo(() => createGetSnapshot(readable), [readable]);
   const subscribe = useMemo(() => createSubscribe(readable), [readable]);
@@ -45,7 +50,7 @@ const useAwaiStateValue = <T>(readable: ReadableState<T> | ReadableAsyncState<T>
     suspend(isSettledPromise);
   }
 
-  return asyncSnapshot.value!;
+  return asyncSnapshot.value as T;
 };
 
 export default useAwaiStateValue;
