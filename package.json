@@ -56,6 +56,6 @@
   },
   "peerDependencies": {
     "awai": "*",
-    "react": "*"
+    "react": "^18.2.0 || ^19.0.0"
   }
 }

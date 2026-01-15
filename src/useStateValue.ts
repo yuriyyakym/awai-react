@@ -4,9 +4,20 @@ import {
   type ReadableState,
   isReadableAsyncState,
 } from 'awai';
-import { use, useMemo, useSyncExternalStore } from 'react';
+import * as React from 'react';
 import createSubscribe from './lib/createSubscribe';
 import createGetSnapshot from './lib/createGetSnapshot';
+
+const { useMemo, useSyncExternalStore } = React;
+const { use } = React as { use?: (promise: Promise<unknown>) => unknown };
+const suspend = (promise: Promise<unknown>) => {
+  if (use) {
+    use(promise);
+    return;
+  }
+
+  throw promise;
+};
 
 const useStateValue = <T>(readable: ReadableState<T> | ReadableAsyncState<T>): T => {
   const isAsync = isReadableAsyncState(readable);
@@ -31,7 +42,7 @@ const useStateValue = <T>(readable: ReadableState<T> | ReadableAsyncState<T>): T
   }
 
   if (isSettledPromise) {
-    use(isSettledPromise);
+    suspend(isSettledPromise);
   }
 
   return asyncSnapshot.value!;
