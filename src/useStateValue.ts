@@ -1,46 +1,51 @@
 import {
-  type InferReadableType,
+  type AsyncValue,
   type ReadableAsyncState,
   type ReadableState,
   isReadableAsyncState,
 } from 'awai';
-import { startTransition, useEffect, useState } from 'react';
+import * as React from 'react';
+import createSubscribe from './lib/createSubscribe';
+import createGetSnapshot from './lib/createGetSnapshot';
 
-const useStateValue = <T extends ReadableState<any> | ReadableAsyncState<any>>(
-  readable: T,
-): InferReadableType<T> => {
-  const [state, setState] = useState<T | undefined>(readable.get);
-
-  if (isReadableAsyncState(readable) && readable.get() === undefined) {
-    startTransition(() => {
-      throw new Promise((resolve) => readable.events.changed.then(resolve));
-    });
+const { useMemo, useSyncExternalStore } = React;
+const { use } = React as { use?: (promise: Promise<unknown>) => unknown };
+const suspend = (promise: Promise<unknown>) => {
+  if (use) {
+    use(promise);
+    return;
   }
 
-  useEffect(() => {
-    let mounted = true;
+  throw promise;
+};
 
-    setState(readable.get());
+const useStateValue = <T>(readable: ReadableState<T> | ReadableAsyncState<T>): T => {
+  const isAsync = isReadableAsyncState(readable);
+  const getSnapshot = useMemo(() => createGetSnapshot(readable), [readable]);
+  const subscribe = useMemo(() => createSubscribe(readable), [readable]);
+  const snapshot = useSyncExternalStore(subscribe, getSnapshot);
+  const isLoading = isAsync && (snapshot as AsyncValue<T>).isLoading;
 
-    (async () => {
-      while (mounted) {
-        /**
-         * @todo Cleanup on unmount
-         * @url https://github.com/yuriyyakym/awai/issues/1
-         */
-        const newValue = await readable.events.changed;
-        if (mounted) {
-          setState(newValue);
-        }
-      }
-    })();
+  const isSettledPromise = useMemo(
+    () => (isLoading ? readable.getPromise() : undefined),
+    [readable, isLoading],
+  );
 
-    return () => {
-      mounted = false;
-    };
-  }, [readable]);
+  if (!isAsync) {
+    return snapshot as T;
+  }
 
-  return state as InferReadableType<T>;
+  const asyncSnapshot = snapshot as AsyncValue<T>;
+
+  if (asyncSnapshot.error) {
+    throw asyncSnapshot.error;
+  }
+
+  if (isSettledPromise) {
+    suspend(isSettledPromise);
+  }
+
+  return asyncSnapshot.value!;
 };
 
 export default useStateValue;

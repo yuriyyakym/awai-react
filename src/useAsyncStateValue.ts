@@ -1,54 +1,13 @@
-import type { InferReadableType, ReadableAsyncState, AsyncValue } from 'awai';
-import { useEffect, useState } from 'react';
+import type { ReadableAsyncState, AsyncValue } from 'awai';
+import { useMemo, useSyncExternalStore } from 'react';
+import createGetSnapshot from './lib/createGetSnapshot';
+import createSubscribe from './lib/createSubscribe';
 
-const useAsyncStateValue = <T extends ReadableAsyncState<any>, V = InferReadableType<T>>(
-  readable: T,
-): AsyncValue<V> => {
-  const [state, setState] = useState<AsyncValue<V>>(readable.getAsync);
+const useAsyncStateValue = <T>(readable: ReadableAsyncState<T>): AsyncValue<T> => {
+  const subscribe = useMemo(() => createSubscribe(readable), [readable]);
+  const getSnapshot = useMemo(() => createGetSnapshot(readable), [readable]);
 
-  useEffect(() => {
-    let mounted = true;
-    let abortController: AbortController;
-
-    setState(readable.getAsync());
-
-    (async () => {
-      while (mounted) {
-        abortController = new AbortController();
-        /**
-         * @todo Cleanup on unmount
-         * @url https://github.com/yuriyyakym/awai/issues/1
-         */
-        try {
-          await Promise.any([
-            readable.events.fulfilled.abortable(abortController),
-            readable.events.rejected.abortable(abortController),
-            readable.events.requested.abortable(abortController),
-          ]);
-
-          const newAsync = readable.getAsync();
-          const isChanged =
-            newAsync.error !== state.error ||
-            newAsync.isLoading !== state.isLoading ||
-            newAsync.value !== state.value;
-
-          if (isChanged && mounted) {
-            setState(readable.getAsync());
-          }
-        } catch {
-        } finally {
-          abortController.abort();
-        }
-      }
-    })();
-
-    return () => {
-      mounted = false;
-      abortController?.abort();
-    };
-  }, [readable]);
-
-  return state;
+  return useSyncExternalStore(subscribe, getSnapshot);
 };
 
 export default useAsyncStateValue;
