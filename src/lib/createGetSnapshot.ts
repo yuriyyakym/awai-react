@@ -9,23 +9,24 @@ type SnapshotValue<R> = R extends ReadableAsyncState<infer T>
 type ReadableInput = ReadableState<any> | ReadableAsyncState<any>;
 
 function createGetSnapshot<const R extends ReadableInput>(readable: R): () => SnapshotValue<R> {
-  let previousSnapshot: AsyncValue<unknown> | undefined = undefined;
-
   if (!isReadableAsyncState(readable)) {
     return () => readable.get();
   }
 
+  let previousSnapshot: AsyncValue<unknown> | undefined = undefined;
+
   return () => {
     const snapshot = readable.getAsync();
-    const isChanged =
-      snapshot.error !== previousSnapshot?.error ||
-      snapshot.isLoading !== previousSnapshot?.isLoading ||
-      snapshot.value !== previousSnapshot?.value;
+    const isEaual =
+      snapshot.error === previousSnapshot?.error ||
+      snapshot.isLoading === previousSnapshot?.isLoading ||
+      snapshot.value === previousSnapshot?.value;
 
-    if (isChanged) {
-      previousSnapshot = snapshot;
+    if (isEaual) {
+      return previousSnapshot as SnapshotValue<R>;
     }
 
+    previousSnapshot = snapshot;
     return snapshot as SnapshotValue<R>;
   };
 }
